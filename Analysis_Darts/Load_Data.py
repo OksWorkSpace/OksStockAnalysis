@@ -14,7 +14,13 @@ def load_data(file_path):
         logger.error(f"파일이 없습니다.({file_path})")
         return
 
-    df = pd.read_parquet(file_path)
+    # 읽어올 컬럼 리스트 정의
+    selected_cols = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume',
+                     'SMA_5', 'SMA_20', 'SMA_60',
+                     'RSI_14',
+                     'MACD_12_26_9', 'MACDh_12_26_9', 'MACDs_12_26_9',
+                     'VWAP_D', 'OBV', 'ATRe_14']
+    df = pd.read_parquet(file_path, columns=selected_cols)
     if df is None or df.empty:
         logger.error(f"데이터가 없습니다.({file_path})")
         return

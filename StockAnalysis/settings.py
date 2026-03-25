@@ -19,14 +19,14 @@ class SettingsManager:
 
     def save_settings(self):
         """현재 메모리에 있는 설정값을 JSON 파일로 저장"""
-        settings = {
+        dic_settings = {
             "data_folder": self.data_folder,
             "np_path": self.np_path,
             "darts_path": self.darts_path
         }
         try:
             with open(self.setting_path, "w", encoding='utf-8') as f:
-                json.dump(settings, f, indent=4, ensure_ascii=False)  # type: ignore
+                json.dump(dic_settings, f, indent=4, ensure_ascii=False)  # type: ignore
             print(f"설정 저장 완료: {self.setting_path}")
         except Exception as e:
             print(f"저장 중 오류 발생: {e}")

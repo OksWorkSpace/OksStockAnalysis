@@ -130,8 +130,41 @@ def add_stocks_indicators(df):
     # RSI
     df.ta.rsi(length=14, append=True)
 
+    # Stochastic RSI : length=14, rsi_length=14, k=3, d=3
+    df.ta.stochrsi(append=True)
+    # --- A. Stochastic RSI 통합 신호 ---
+    df['stochrsi_sig'] = 0  # 기본값 0
+    # 골든크로스 조건 (1)
+    df.loc[(df['STOCHRSIk_14_14_3_3'] > df['STOCHRSId_14_14_3_3']) &
+           (df['STOCHRSIk_14_14_3_3'].shift(1) <= df['STOCHRSId_14_14_3_3'].shift(1)), 'stochrsi_sig'] = 1
+    # 데드크로스 조건 (-1)
+    df.loc[(df['STOCHRSIk_14_14_3_3'] < df['STOCHRSId_14_14_3_3']) &
+           (df['STOCHRSIk_14_14_3_3'].shift(1) >= df['STOCHRSId_14_14_3_3'].shift(1)), 'stochrsi_sig'] = -1
+
+    # RSI 볼린저 밴드(접두사 'RSI_' 추가)
+    df.ta.bbands(close="RSI_14", length=20, std=2.0, prefix="RSI", append=True)
+    # --- B. RSI 볼린저 밴드 통합 신호 ---
+    df['rsi_bb_sig'] = 0
+    df.loc[(df['RSI_14'] > df['RSI_BBL_20_2.0']) & (df['RSI_14'].shift(1) <= df['RSI_BBL_20_2.0'].shift(1)), 'rsi_bb_sig'] = 1
+    df.loc[(df['RSI_14'] < df['RSI_BBU_20_2.0']) & (df['RSI_14'].shift(1) >= df['RSI_BBU_20_2.0'].shift(1)), 'rsi_bb_sig'] = -1
+
     # MACD
     df.ta.macd(close="Close", fast=12, slow=26, signal=9, append=True)
+
+    # MACD + stoch
+    # MACD 값을 '종가'처럼 취급하여 스토캐스틱을 계산합니다.
+    # 하이/로우 데이터가 따로 없으므로 macd_line을 고가, 저가, 종가 자리에 모두 넣습니다.
+    df.ta.stoch(high="MACD_12_26_9", low="MACD_12_26_9", close="MACD_12_26_9",
+                k=14, d=3, smooth_k=3, prefix="MACD",append=True)
+    # --- C. MACD-Stochastic 통합 신호 ---
+    df['macd_stoch_sig'] = 0
+    df.loc[(df['MACD_STOCHk_14_3_3'] > df['MACD_STOCHd_14_3_3']) &
+           (df['MACD_STOCHk_14_3_3'].shift(1) <= df['MACD_STOCHd_14_3_3'].shift(1)), 'macd_stoch_sig'] = 1
+    df.loc[(df['MACD_STOCHk_14_3_3'] < df['MACD_STOCHd_14_3_3']) &
+           (df['MACD_STOCHk_14_3_3'].shift(1) >= df['MACD_STOCHd_14_3_3'].shift(1)), 'macd_stoch_sig'] = -1
+
+    # 스토캐스틱 : 'k', 'd', 'smooth_k'는 기본값이 각각 14, 3, 3으로 설정되어 있음
+    df.ta.stoch(append=True)
 
     # VWAP(Volume Weighted Average Price, 거래량 가중 평균 가격)
     # 기관/대형 투자자들이 실제로 얼마에 매수했는지를 보여줌

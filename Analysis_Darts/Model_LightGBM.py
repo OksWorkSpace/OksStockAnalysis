@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import pandas as pd
 from darts import TimeSeries
@@ -6,12 +8,13 @@ from darts.utils.missing_values import fill_missing_values
 from darts.dataprocessing.transformers import Scaler
 import warnings
 
-
 warnings.filterwarnings("ignore", message="X does not have valid feature names")
+
+# 로거 가져오기
+logger = logging.getLogger(__name__)
 
 
 def run_LightGBM(df):
-
     # 예측 대상 (종가)
     series_target = TimeSeries.from_dataframe(df, time_col='Time', value_cols='Log_Return', freq='D')
     series_target = fill_missing_values(series_target)
@@ -46,7 +49,9 @@ def run_LightGBM(df):
         learning_rate=0.05,  # 0.1은 너무 빠르고 0.01은 너무 느림
         num_leaves=31,  # 기본값 유지 (트리 복잡도)
         max_depth=10,  # 너무 깊게 파지 않도록 제한
-        random_state=42
+        random_state=42,
+        verbosity=-1,
+        force_col_wise=True,  # 메시지에서 제안한 설정을 직접 주입
     )
 
     # 학습 시 보조지표 함께 전달
@@ -80,9 +85,21 @@ def run_LightGBM(df):
 
 
 def check_nans(series):
+    # 1. 데이터프레임 변환 (시리즈인 경우 그대로 사용하거나 변환)
     df = series.to_dataframe()
+
+    # 2. 각 컬럼별 NaN 개수 계산
     nans = df.isna().sum()
-    total = nans.sum()
-    print("컬럼별 NaN:", nans)
-    print(f"총 NaN: {total}")
+
+    # 3. NaN이 1개라도 있는 항목만 필터링
+    nans_only = nans[nans > 0]
+    total = nans_only.sum()
+
+    # 4. 결측치가 있을 때만 출력
+    if total > 0:
+        # 인자를 콤마(,)로 구분하지 말고 f-string 하나로 합치세요
+        logger.info(f"결측치 발견 항목:\n{nans_only}")
+        logger.info(f"총 NaN 개수: {total}")
+
+    # 5. 결측치가 없으면 True 반환 (학습 진행 가능)
     return total == 0

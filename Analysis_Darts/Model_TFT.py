@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import pandas as pd
 from darts import TimeSeries
@@ -7,8 +9,10 @@ from darts.models import TFTModel
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 import warnings
 
-
 warnings.filterwarnings("ignore", message="X does not have valid feature names")
+
+# 로거 가져오기
+logger = logging.getLogger(__name__)
 
 
 def run_TFTModel(df):
@@ -60,7 +64,10 @@ def run_TFTModel(df):
         optimizer_kwargs={"lr": 1e-3},  # 학습률 설정
         pl_trainer_kwargs={
             "callbacks": [my_stopper],
-            "accelerator": "auto"  # GPU가 있으면 자동으로 GPU 사용
+            "accelerator": "auto",  # GPU가 있으면 자동으로 GPU 사용
+            "logger": False,
+            "enable_checkpointing": False,
+            "enable_progress_bar": False,
         },
         random_state=42
     )
@@ -69,7 +76,7 @@ def run_TFTModel(df):
     model_tft.fit(
         series=series_target_scaled,  # 100% 데이터
         past_covariates=series_covar_scaled,
-        verbose=True
+        verbose=False
         # val_series 인자를 아예 생략함
     )
 
@@ -101,9 +108,21 @@ def run_TFTModel(df):
 
 
 def check_nans(series):
+    # 1. 데이터프레임 변환 (시리즈인 경우 그대로 사용하거나 변환)
     df = series.to_dataframe()
+
+    # 2. 각 컬럼별 NaN 개수 계산
     nans = df.isna().sum()
-    total = nans.sum()
-    print("컬럼별 NaN:", nans)
-    print(f"총 NaN: {total}")
+
+    # 3. NaN이 1개라도 있는 항목만 필터링
+    nans_only = nans[nans > 0]
+    total = nans_only.sum()
+
+    # 4. 결측치가 있을 때만 출력
+    if total > 0:
+        # 인자를 콤마(,)로 구분하지 말고 f-string 하나로 합치세요
+        logger.info(f"결측치 발견 항목:\n{nans_only}")
+        logger.info(f"총 NaN 개수: {total}")
+
+    # 5. 결측치가 없으면 True 반환 (학습 진행 가능)
     return total == 0

@@ -46,6 +46,9 @@ class MainWindow(QMainWindow):
         self.ui.chk_kosdaq.setChecked(True)
         self.ui.chk_kosdaq.stateChanged.connect(self.chkMarketChanged)
 
+        # 기술적 분석 버튼
+        self.ui.btn_chart_analysis.clicked.connect(self.btnChartAnalysisClicked)
+
         # AI 예측 모델 버튼
         self.ui.btn_run_model.clicked.connect(self.btnRunModelClicked)
 
@@ -94,13 +97,6 @@ class MainWindow(QMainWindow):
         column_idx = self.df_stock.columns.get_loc('시가총액')
         self.ui.tableView_stock.sortByColumn(column_idx, Qt.SortOrder.DescendingOrder)
 
-    # def pushBtnClicked(self):
-    #     chart = ChartWidget('005930', '삼성전자')
-    #     chart.closed.connect(self.remove_chart_from_list)
-    #     self.charts.append(chart)  # 리스트에 담아두면 메모리에서 삭제되지 않습니다.
-    #     chart.show()
-    #     # fdr_update_stock('005930', '삼성전자')
-
     def remove_chart_from_list(self, chart_obj):
         if chart_obj in self.charts:
             self.charts.remove(chart_obj)
@@ -140,6 +136,10 @@ class MainWindow(QMainWindow):
         # 1. 신호를 보낸 위젯(체크박스) 찾기
         sender = self.sender()
 
+    # 기술적 분석 실행
+    def btnChartAnalysisClicked(self):
+        fdr_update_stock('005930', '삼성전자')
+
     # AI 예측 모델 실행
     def btnRunModelClicked(self):
         # 선택 모델에서 선택된 인덱스들 가져오기
@@ -147,6 +147,9 @@ class MainWindow(QMainWindow):
         selected_indices = selection_model.selectedRows()  # 행 전체가 선택된 경우 유용
         if not selected_indices:
             QMessageBox.information(self, '알림', "선택 항목이 없습니다.")
+            return
+        if len(selected_indices) > 50:
+            QMessageBox.information(self, '알림', "50 종목 이하로 실행해 주세요.")
             return
         selected_stock_list = []  # 결과를 담을 빈 리스트
         for index in selected_indices:

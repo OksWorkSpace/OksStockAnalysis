@@ -15,16 +15,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QDialog,
-    QHBoxLayout, QLineEdit, QListWidget, QListWidgetItem,
-    QPlainTextEdit, QPushButton, QSizePolicy, QSpacerItem,
+from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QHBoxLayout,
+    QHeaderView, QLineEdit, QPlainTextEdit, QPushButton,
+    QSizePolicy, QSpacerItem, QTableWidget, QTableWidgetItem,
     QVBoxLayout, QWidget)
 
 class Ui_RunModelDialog(object):
     def setupUi(self, RunModelDialog):
         if not RunModelDialog.objectName():
             RunModelDialog.setObjectName(u"RunModelDialog")
-        RunModelDialog.resize(897, 505)
+        RunModelDialog.resize(912, 489)
         self.verticalLayout = QVBoxLayout(RunModelDialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout = QHBoxLayout()
@@ -135,13 +135,10 @@ class Ui_RunModelDialog(object):
 
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.list_stocks = QListWidget(RunModelDialog)
-        self.list_stocks.setObjectName(u"list_stocks")
-        self.list_stocks.setEnabled(True)
-        self.list_stocks.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.list_stocks.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.tableWidget = QTableWidget(RunModelDialog)
+        self.tableWidget.setObjectName(u"tableWidget")
 
-        self.horizontalLayout_4.addWidget(self.list_stocks)
+        self.horizontalLayout_4.addWidget(self.tableWidget)
 
         self.text_output = QPlainTextEdit(RunModelDialog)
         self.text_output.setObjectName(u"text_output")
@@ -150,8 +147,6 @@ class Ui_RunModelDialog(object):
 
         self.horizontalLayout_4.addWidget(self.text_output)
 
-        self.horizontalLayout_4.setStretch(0, 1)
-        self.horizontalLayout_4.setStretch(1, 4)
 
         self.verticalLayout.addLayout(self.horizontalLayout_4)
 

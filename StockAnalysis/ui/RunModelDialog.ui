@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>897</width>
-    <height>505</height>
+    <width>912</width>
+    <height>489</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -225,19 +225,9 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,4">
+    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0">
      <item>
-      <widget class="QListWidget" name="list_stocks">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="editTriggers">
-        <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-       </property>
-       <property name="selectionMode">
-        <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
-       </property>
-      </widget>
+      <widget class="QTableWidget" name="tableWidget"/>
      </item>
      <item>
       <widget class="QPlainTextEdit" name="text_output">

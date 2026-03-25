@@ -127,6 +127,7 @@ class ChartWidget(QWidget):
         # fplt.plot(self.df_stock["SMA_10"], ax=self.ax, color="#99FFFF", width=1, legend="SMA_10")
         # fplt.plot(self.df_stock["SMA_20"], ax=self.ax, color="#0000FF", width=1, legend="SMA_20")
         fplt.plot(self.df_stock["SMA_60"], ax=self.ax, color="#990099", width=1, legend="SMA_60")
+        # fplt.plot(self.df_stock["SMA_120"], ax=self.ax, color="#0000FF", width=1, legend="SMA_120")
         # fplt.plot(self.df_stock["SMA_200"], ax=self.ax, color="#CC33FF", width=1, legend="SMA_200")
 
         # 볼린져 밴드

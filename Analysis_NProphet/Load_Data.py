@@ -15,7 +15,13 @@ def load_data(file_path):
         logger.error(f"파일이 없습니다.({file_path})")
         return
 
-    df = pd.read_parquet(file_path)
+    # 읽어올 컬럼 리스트 정의
+    selected_cols = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume',
+                     'SMA_5', 'SMA_20', 'SMA_60',
+                     'RSI_14',
+                     'MACD_12_26_9', 'MACDh_12_26_9', 'MACDs_12_26_9',
+                     'VWAP_D', 'OBV', 'ATRe_14']
+    df = pd.read_parquet(file_path, columns=selected_cols)
     if df is None or df.empty:
         logger.error(f"데이터가 없습니다.({file_path})")
         return
@@ -35,7 +41,7 @@ def load_data(file_path):
 
     # 3. 거래량은 반드시 0으로 채웁니다.
     df_full['Volume'] = df_full['Volume'].fillna(0)
-    df_full['Change'] = df_full['Change'].fillna(0)
+    # df_full['Change'] = df_full['Change'].fillna(0)
 
     # 지표 새로 계산
     df_full = add_stocks_indicators(df_full)
@@ -75,16 +81,16 @@ def load_data(file_path):
 def add_stocks_indicators(df):
     # 이평계산
     df.ta.sma(length=5, append=True)
-    df.ta.sma(length=10, append=True)
+    # df.ta.sma(length=10, append=True)
     df.ta.sma(length=20, append=True)
     df.ta.sma(length=60, append=True)
-    df.ta.sma(length=120, append=True)
-    df.ta.sma(length=200, append=True)
+    # df.ta.sma(length=120, append=True)
+    # df.ta.sma(length=200, append=True)
 
     # 볼린져 밴드
-    df.ta.bbands(length=20, std=1.0, append=True)
-    df.ta.bbands(length=20, std=2.0, append=True)
-    df.ta.bbands(length=20, std=3.0, append=True)
+    # df.ta.bbands(length=20, std=1.0, append=True)
+    # df.ta.bbands(length=20, std=2.0, append=True)
+    # df.ta.bbands(length=20, std=3.0, append=True)
 
     # RSI
     df.ta.rsi(length=14, append=True)
@@ -106,30 +112,35 @@ def add_stocks_indicators(df):
               append=True  # 기존 df에 ATR 컬럼 추가
               )
 
-    # 캔들패턴 분석
-    patterns_df = df.ta.cdl_pattern(name="all")
-    df['candle_pattern'] = patterns_df.apply(lambda x: ", ".join([c.replace('CDL_', '') for c in x[x != 0].index]), axis=1)
-
-    # 두 신호가 동시에 뜨면 0으로 상쇄하거나 별도 처리하고 싶을 때
-    def combine_signals(x):
-        has_bull = any(x > 0)
-        has_bear = any(x < 0)
-        if has_bull and has_bear:
-            return 0  # 혹은 혼조세 신호로 정의
-        if has_bull:
-            return 1
-        if has_bear:
-            return -1
-        return 0
-
-    df['candle_signal'] = patterns_df.apply(combine_signals, axis=1)
+    # # # 캔들패턴 분석
+    # patterns_df = df.ta.cdl_pattern(name="all")
+    # df['candle_pattern'] = patterns_df.apply(lambda x: ", ".join([c.replace('CDL_', '') for c in x[x != 0].index]), axis=1)
+    #
+    # # 두 신호가 동시에 뜨면 0으로 상쇄하거나 별도 처리하고 싶을 때
+    # def combine_signals(x):
+    #     has_bull = any(x > 0)
+    #     has_bear = any(x < 0)
+    #     if has_bull and has_bear:
+    #         return 0  # 혹은 혼조세 신호로 정의
+    #     if has_bull:
+    #         return 1
+    #     if has_bear:
+    #         return -1
+    #     return 0
+    #
+    # df['candle_signal'] = patterns_df.apply(combine_signals, axis=1)
 
     return df
 
 
 def check_nans(df):
+    # 각 컬럼별 NaN 개수 계산
     nans = df.isna().sum()
-    total = nans.sum()
-    logger.info("컬럼별 NaN:", nans)
-    logger.info(f"총 NaN: {total}")
+    # NaN이 1개라도 있는 컬럼만 필터링
+    nans_only = nans[nans > 0]
+    total = nans_only.sum()
+    if total > 0:
+        # 인자를 콤마(,)로 구분하지 말고 f-string 하나로 합치세요
+        logger.info(f"결측치 발견 항목:\n{nans_only}")
+        logger.info(f"총 NaN 개수: {total}")
     return total == 0

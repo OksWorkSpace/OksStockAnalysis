@@ -89,6 +89,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer)
 
+        self.btn_chart_analysis = QPushButton(self.groupBox_stock_day)
+        self.btn_chart_analysis.setObjectName(u"btn_chart_analysis")
+
+        self.horizontalLayout_2.addWidget(self.btn_chart_analysis)
+
         self.btn_run_model = QPushButton(self.groupBox_stock_day)
         self.btn_run_model.setObjectName(u"btn_run_model")
         sizePolicy.setHeightForWidth(self.btn_run_model.sizePolicy().hasHeightForWidth())
@@ -131,6 +136,7 @@ class Ui_MainWindow(object):
         self.chk_kospi.setText(QCoreApplication.translate("MainWindow", u"KOSPI", None))
         self.chk_kosdaqg.setText(QCoreApplication.translate("MainWindow", u"KOSDAQ GLOBAL", None))
         self.chk_kosdaq.setText(QCoreApplication.translate("MainWindow", u"KOSDAQ", None))
+        self.btn_chart_analysis.setText(QCoreApplication.translate("MainWindow", u"\uae30\uc220\uc801 \ubd84\uc11d", None))
         self.btn_run_model.setText(QCoreApplication.translate("MainWindow", u"\uc885\uac00\uc608\uce21", None))
     # retranslateUi
 

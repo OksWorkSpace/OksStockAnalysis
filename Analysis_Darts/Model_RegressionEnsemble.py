@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import pandas as pd
 from darts import TimeSeries
@@ -9,8 +11,10 @@ from darts.models import RegressionEnsembleModel
 from sklearn.linear_model import Ridge
 import warnings
 
-
 warnings.filterwarnings("ignore", message="X does not have valid feature names")
+
+# 로거 가져오기
+logger = logging.getLogger(__name__)
 
 
 def run_RegressionEnsembleModel(df):
@@ -46,15 +50,27 @@ def run_RegressionEnsembleModel(df):
 
     model_tide = TiDEModel(
         input_chunk_length=input_len, output_chunk_length=output_len,
-        n_epochs=50, random_state=42
+        n_epochs=50, random_state=42,
+        pl_trainer_kwargs={
+            "enable_progress_bar": False,  # 진행 바 제거
+            "enable_checkpointing": False,  # 체크포인트 파일 생성 방지
+            "logger": False  # hparams.yaml 등 로그 방지
+        }
     )
     model_dlinear = DLinearModel(
         input_chunk_length=input_len, output_chunk_length=output_len,
-        n_epochs=50, random_state=42
+        n_epochs=50, random_state=42,
+        pl_trainer_kwargs={
+            "enable_progress_bar": False,
+            "enable_checkpointing": False,
+            "logger": False
+        }
     )
     model_lgbm = LightGBMModel(
         lags=input_len, lags_past_covariates=12,
-        output_chunk_length=output_len, random_state=42
+        output_chunk_length=output_len, random_state=42,
+        verbosity=-1,  # Fatal 에러 외 모든 로그 차단
+        force_col_wise=True  # "Auto-choosing..." 안내 문구 제거
     )
 
     # 4. 앙상블 모델 정의 (최종 결합: Ridge 회귀)
@@ -99,9 +115,21 @@ def run_RegressionEnsembleModel(df):
 
 
 def check_nans(series):
+    # 1. 데이터프레임 변환 (시리즈인 경우 그대로 사용하거나 변환)
     df = series.to_dataframe()
+
+    # 2. 각 컬럼별 NaN 개수 계산
     nans = df.isna().sum()
-    total = nans.sum()
-    print("컬럼별 NaN:", nans)
-    print(f"총 NaN: {total}")
+
+    # 3. NaN이 1개라도 있는 항목만 필터링
+    nans_only = nans[nans > 0]
+    total = nans_only.sum()
+
+    # 4. 결측치가 있을 때만 출력
+    if total > 0:
+        # 인자를 콤마(,)로 구분하지 말고 f-string 하나로 합치세요
+        logger.info(f"결측치 발견 항목:\n{nans_only}")
+        logger.info(f"총 NaN 개수: {total}")
+
+    # 5. 결측치가 없으면 True 반환 (학습 진행 가능)
     return total == 0

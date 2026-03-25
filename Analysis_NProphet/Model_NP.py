@@ -1,8 +1,15 @@
 import logging
+import warnings
+
 from neuralprophet import NeuralProphet
 
 # 로거 가져오기
 logger = logging.getLogger(__name__)
+
+# 모든 경고 및 정보성 로그 차단
+logging.getLogger("pytorch_lightning").setLevel(logging.ERROR)
+logging.getLogger("neuralprophet").setLevel(logging.ERROR)
+warnings.filterwarnings("ignore")
 
 
 def run_neuralprophet(df):
@@ -29,7 +36,7 @@ def run_neuralprophet(df):
 
         # 학습 관련
         epochs=100,  # 반복 학습 횟수
-        learning_rate=0.03  # 학습률
+        learning_rate=0.03,  # 학습률
     )
 
     # 보조 지표 컬럼
@@ -51,7 +58,7 @@ def run_neuralprophet(df):
         model.add_lagged_regressor(names=regressor)
 
     # 학습 실행 (epochs 조절을 통해 과적합 방지)
-    model.fit(df, freq='D')
+    model.fit(df, freq='D', progress=None)
 
     # 3. 미래 예측
     future = model.make_future_dataframe(df, periods=5, n_historic_predictions=True)
