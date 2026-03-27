@@ -62,7 +62,8 @@ class ChartWidget(QWidget):
         fplt.candle_bull_body_color = '#ff0000'
         fplt.candle_bear_body_color = '#0000ff'
 
-        self.ax, self.ax_rsi, self.ax_macd = fplt.create_plot(init_zoom_periods=100, rows=3)
+        self.ax, self.ax_rsi, self.ax_macd, self.ax_stochrsi, self.ax_rsibb, self.ax_macdstoch = fplt.create_plot(
+            init_zoom_periods=100, rows=6)
         self.ui.graphicsView.axs = [self.ax, self.ax_rsi, self.ax_macd]  # finplot requres this property
         self.ax_volume = self.ax.overlay()  # 거래량 챠트
         gridLayout.addWidget(self.ax.vb.win)
@@ -79,19 +80,19 @@ class ChartWidget(QWidget):
         self.df_stock = pd.read_parquet(self.stock_file)
         self.df_candle = self.df_stock[['Time', 'Open', 'Close', 'High', 'Low']]
         # 하이킨아시 계산
-        self.df_heikin = self.df_candle.copy()
-        cols = ['Open', 'High', 'Low', 'Close']
-        self.df_heikin[cols] = self.df_heikin[cols].astype(float)
-        # 종가: (시+고+저+종) / 4
-        self.df_heikin['Close'] = (self.df_heikin['Open'] + self.df_heikin['High'] + self.df_heikin['Low'] + self.df_heikin['Close']) / 4
-        # 시가: (이전봉 시가 + 이전봉 종가) / 2
-        # (첫 번째 봉은 원본 시가 사용, 이후는 반복 계산 필요)
-        for i in range(1, len(self.df_heikin)):
-            self.df_heikin.loc[self.df_heikin.index[i], 'Open'] = (self.df_heikin.loc[self.df_heikin.index[i - 1], 'Open'] +
-                self.df_heikin.loc[self.df_heikin.index[i - 1], 'Close']) / 2
-        # 고가: max(고가, 시가, 종가) / 저가: min(저가, 시가, 종가)
-        self.df_heikin['High'] = self.df_heikin[['High', 'Open', 'Close']].max(axis=1)
-        self.df_heikin['Low'] = self.df_heikin[['Low', 'Open', 'Close']].min(axis=1)
+        # self.df_heikin = self.df_candle.copy()
+        # cols = ['Open', 'High', 'Low', 'Close']
+        # self.df_heikin[cols] = self.df_heikin[cols].astype(float)
+        # # 종가: (시+고+저+종) / 4
+        # self.df_heikin['Close'] = (self.df_heikin['Open'] + self.df_heikin['High'] + self.df_heikin['Low'] + self.df_heikin['Close']) / 4
+        # # 시가: (이전봉 시가 + 이전봉 종가) / 2
+        # # (첫 번째 봉은 원본 시가 사용, 이후는 반복 계산 필요)
+        # for i in range(1, len(self.df_heikin)):
+        #     self.df_heikin.loc[self.df_heikin.index[i], 'Open'] = (self.df_heikin.loc[self.df_heikin.index[i - 1], 'Open'] +
+        #         self.df_heikin.loc[self.df_heikin.index[i - 1], 'Close']) / 2
+        # # 고가: max(고가, 시가, 종가) / 저가: min(저가, 시가, 종가)
+        # self.df_heikin['High'] = self.df_heikin[['High', 'Open', 'Close']].max(axis=1)
+        # self.df_heikin['Low'] = self.df_heikin[['Low', 'Open', 'Close']].min(axis=1)
 
         # 챠트 업데이트
         self.updateChart()
@@ -117,6 +118,9 @@ class ChartWidget(QWidget):
         self.ax_rsi.reset()
         self.ax_macd.reset()
         self.ax_volume.reset()
+        self.ax_stochrsi.reset()
+        self.ax_rsibb.reset()
+        self.ax_macdstoch.reset()
 
         # 캔들 + 거래량
         fplt.candlestick_ochl(self.df_candle, ax=self.ax)
@@ -131,17 +135,18 @@ class ChartWidget(QWidget):
         # fplt.plot(self.df_stock["SMA_200"], ax=self.ax, color="#CC33FF", width=1, legend="SMA_200")
 
         # 볼린져 밴드
-        fplt.plot(self.df_stock["BBU_20_1.0"], ax=self.ax, color="#FF99CC", width=1, legend="BBU_20_1.0")
-        fplt.plot(self.df_stock["BBL_20_1.0"], ax=self.ax, color="#FF99CC", width=1, legend="BBL_20_1.0")
+        # fplt.plot(self.df_stock["BBU_20_1.0"], ax=self.ax, color="#FF99CC", width=1, legend="BBU_20_1.0")
+        # fplt.plot(self.df_stock["BBL_20_1.0"], ax=self.ax, color="#FF99CC", width=1, legend="BBL_20_1.0")
         fplt.plot(self.df_stock["BBU_20_2.0"], ax=self.ax, color="#FF66CC", width=1, legend="BBU_20_2.0")
+        fplt.plot(self.df_stock["BBM_20_2.0"], ax=self.ax, color="#000000", width=1, legend="BBU_20_2.0")
         fplt.plot(self.df_stock["BBL_20_2.0"], ax=self.ax, color="#FF66CC", width=1, legend="BBL_20_2.0")
-        fplt.plot(self.df_stock["BBU_20_3.0"], ax=self.ax, color="#FF33CC", width=1, legend="BBU_20_3.0")
-        fplt.plot(self.df_stock["BBL_20_3.0"], ax=self.ax, color="#FF33CC", width=1, legend="BBL_20_3.0")
+        # fplt.plot(self.df_stock["BBU_20_3.0"], ax=self.ax, color="#FF33CC", width=1, legend="BBU_20_3.0")
+        # fplt.plot(self.df_stock["BBL_20_3.0"], ax=self.ax, color="#FF33CC", width=1, legend="BBL_20_3.0")
 
         # RSI 차트 (두 번째 행) ---
         fplt.plot(self.df_stock['RSI_14'], ax=self.ax_rsi, legend='RSI (14)', color='#9b59b6')
         # 과매수(70)/과매도(30) 기준선 추가
-        fplt.add_band(30, 70, ax=self.ax_rsi)
+        fplt.add_horizontal_band(30, 70, ax=self.ax_rsi)
         # Y축 고정
         # 해당 축의 자동 스케일링 기능을 완전히 끕니다.
         # 줌을 하거나 데이터를 이동해도 Y축이 변하지 않게 고정합니다.
@@ -164,18 +169,26 @@ class ChartWidget(QWidget):
         self.ax_rsi.setXLink(self.ax)
         self.ax_macd.setXLink(self.ax)
 
-        # 3. RSI 결합 최종 판단 (시각화용 불리언 시리즈)
-        # 상승신호(1) + RSI 35 이하 / 하락신호(-1) + RSI 65 이상
-        buy_mask = (self.df_stock['candle_signal'] == 1) & (self.df_stock['RSI_14'] <= 35)
-        sell_mask = (self.df_stock['candle_signal'] == -1) & (self.df_stock['RSI_14'] >= 65)
+        # 캔틀 시그널 화살표
+        buy_candle = (self.df_stock['Low'] * 0.98).where(self.df_stock['candle_signal'] == 1)
+        sell_candle = (self.df_stock['High'] * 1.02).where(self.df_stock['candle_signal'] == -1)
+        fplt.plot(buy_candle, ax=self.ax, style='^', color='#00c853', width=1)
+        fplt.plot(sell_candle, ax=self.ax, style='v', color='#ff1744', width=1)
 
-        # 매수 화살표 및 패턴명 표시
-        for idx, row in self.df_stock[buy_mask].iterrows():
-            fplt.plot(row['Time'], row['Low'] * 0.97, ax=self.ax, color='#00ff00', style='^', width=1)
+        # stoch_ris 시그널
+        fplt.plot(self.df_stock['STOCHRSIk_14_14_3_3'], ax=self.ax_stochrsi, legend='STOCHRSIk', color='#3498db')
+        fplt.plot(self.df_stock['STOCHRSId_14_14_3_3'], ax=self.ax_stochrsi, legend='STOCHRSId', color='#e74c3c')
 
-        # 매도 화살표 및 패턴명 표시
-        for idx, row in self.df_stock[sell_mask].iterrows():
-            fplt.plot(row['Time'], row['High'] * 1.03, ax=self.ax, color='#ff0000', style='v', width=1)
+        # rsi_bb 시그널
+        fplt.plot(self.df_stock['RSI_BBL_20_2.0'], ax=self.ax_rsibb, legend='RSI_BBL', color='#3498db')
+        fplt.plot(self.df_stock['RSI_BBM_20_2.0'], ax=self.ax_rsibb, legend='RSI_BBM', color='#e74c3c')
+        fplt.plot(self.df_stock['RSI_BBU_20_2.0'], ax=self.ax_rsibb, legend='RSI_BBU', color='#e74c3c')
+
+        # macd_stoch 시그널
+        # buy_signal = (self.df_stock['Low'] * 0.98).where(self.df_stock['candle_signal'] == 1)
+        # sell_signal = (self.df_stock['High'] * 1.02).where(self.df_stock['candle_signal'] == -1)
+        fplt.plot(self.df_stock['MACD_STOCHk_14_3_3'], ax=self.ax_macdstoch, legend='MACD_STOCHk', color='#3498db')
+        fplt.plot(self.df_stock['MACD_STOCHd_14_3_3'], ax=self.ax_macdstoch, legend='MACD_STOCHd', color='#e74c3c')
 
         fplt.refresh()  # refresh autoscaling when all plots complete
 

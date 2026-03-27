@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ChartWidget</class>
- <widget class="QWidget" name="ChartWidget">
+ <class>ChartWidget2</class>
+ <widget class="QWidget" name="ChartWidget2">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -29,7 +29,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_3">
+    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
@@ -149,7 +149,17 @@
       </layout>
      </item>
      <item>
-      <widget class="QGraphicsView" name="graphicsView"/>
+      <widget class="QWidget" name="widget_container" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(255, 255, 255);</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

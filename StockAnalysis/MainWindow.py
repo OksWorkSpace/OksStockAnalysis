@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QHeaderVie
 from PySide6.QtWidgets import QMessageBox
 
 from ChartWidget import ChartWidget
+from ChartWidget2 import ChartWidget2
 from Fdr_Stock import fdr_update_stock
 from LoadingDialog import LoadingDialog
 from RunModelDialog import RunModelDialog
@@ -76,6 +77,12 @@ class MainWindow(QMainWindow):
                         color: #333333;
                         border: 1px solid #C0C0C0;
                     }
+                    /* 행(아이템)의 여백을 없애서 높이를 최소화 */
+                    QTableView::item {
+                        padding: 0px;
+                        margin: 0px;
+                        border: 0px;
+                    }
                 """)
         header = self.ui.tableView_stock.horizontalHeader()
         header.setStretchLastSection(False)
@@ -83,6 +90,8 @@ class MainWindow(QMainWindow):
         header.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
         # 행 번호 표시
         self.ui.tableView_stock.verticalHeader().setVisible(True)
+        self.ui.tableView_stock.verticalHeader().setDefaultSectionSize(20)  # 기본 행 높이를 20px로 설정 (원하는 만큼 조절)
+        self.ui.tableView_stock.verticalHeader().setMinimumSectionSize(0)  # 최소 높이 제한 해제
         # 내용에 맞춰 행 번호 칸 너비 조절 - 겁나 느려짐
         # self.ui.tableView_stock.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         # 테이블 설정에서 편집 비활성화
@@ -96,6 +105,9 @@ class MainWindow(QMainWindow):
         # '시가총액' 기준 올림차순(DescendingOrder) 정렬
         column_idx = self.df_stock.columns.get_loc('시가총액')
         self.ui.tableView_stock.sortByColumn(column_idx, Qt.SortOrder.DescendingOrder)
+
+        # 1. 시그널과 슬롯(함수) 연결
+        self.ui.tableView_stock.doubleClicked.connect(self.on_tableview_stock_double_clicked)
 
     def remove_chart_from_list(self, chart_obj):
         if chart_obj in self.charts:
@@ -135,6 +147,17 @@ class MainWindow(QMainWindow):
     def chkMarketChanged(self):
         # 1. 신호를 보낸 위젯(체크박스) 찾기
         sender = self.sender()
+
+    def on_tableview_stock_double_clicked(self, index):
+        row = index.row()  # 더블클릭한 행 번호
+        ticker = self.df_stock.loc[row, '종목코드']
+        name = self.df_stock.loc[row, '종목명']
+        # chart = ChartWidget(ticker, name)
+        # chart.show()
+        # self.charts.append(chart)
+        chart2 = ChartWidget2(ticker, name)
+        chart2.show()
+        self.charts.append(chart2)
 
     # 기술적 분석 실행
     def btnChartAnalysisClicked(self):

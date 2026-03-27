@@ -24,20 +24,16 @@ class Ui_ChartWidget(object):
         if not ChartWidget.objectName():
             ChartWidget.setObjectName(u"ChartWidget")
         ChartWidget.resize(1031, 459)
-        self.widget = QWidget(ChartWidget)
-        self.widget.setObjectName(u"widget")
-        self.widget.setGeometry(QRect(20, 10, 951, 431))
-        self.horizontalLayout = QHBoxLayout(self.widget)
+        self.horizontalLayout = QHBoxLayout(ChartWidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.btn_search_news = QPushButton(self.widget)
+        self.btn_search_news = QPushButton(ChartWidget)
         self.btn_search_news.setObjectName(u"btn_search_news")
 
         self.verticalLayout.addWidget(self.btn_search_news)
 
-        self.textBrowser = QTextBrowser(self.widget)
+        self.textBrowser = QTextBrowser(ChartWidget)
         self.textBrowser.setObjectName(u"textBrowser")
 
         self.verticalLayout.addWidget(self.textBrowser)
@@ -51,68 +47,68 @@ class Ui_ChartWidget(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.gridLayout_2 = QGridLayout()
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.label_3 = QLabel(self.widget)
+        self.label_3 = QLabel(ChartWidget)
         self.label_3.setObjectName(u"label_3")
 
         self.gridLayout_2.addWidget(self.label_3, 0, 0, 1, 1)
 
-        self.check_candle = QCheckBox(self.widget)
+        self.check_candle = QCheckBox(ChartWidget)
         self.check_candle.setObjectName(u"check_candle")
 
         self.gridLayout_2.addWidget(self.check_candle, 0, 1, 1, 2)
 
-        self.check_heikin = QCheckBox(self.widget)
+        self.check_heikin = QCheckBox(ChartWidget)
         self.check_heikin.setObjectName(u"check_heikin")
 
         self.gridLayout_2.addWidget(self.check_heikin, 0, 3, 1, 2)
 
-        self.label = QLabel(self.widget)
+        self.label = QLabel(ChartWidget)
         self.label.setObjectName(u"label")
 
         self.gridLayout_2.addWidget(self.label, 1, 0, 1, 1)
 
-        self.check_sma5 = QCheckBox(self.widget)
+        self.check_sma5 = QCheckBox(ChartWidget)
         self.check_sma5.setObjectName(u"check_sma5")
         self.check_sma5.setMinimumSize(QSize(0, 0))
 
         self.gridLayout_2.addWidget(self.check_sma5, 1, 1, 1, 1)
 
-        self.check_sma10 = QCheckBox(self.widget)
+        self.check_sma10 = QCheckBox(ChartWidget)
         self.check_sma10.setObjectName(u"check_sma10")
 
         self.gridLayout_2.addWidget(self.check_sma10, 1, 2, 1, 1)
 
-        self.check_sma20 = QCheckBox(self.widget)
+        self.check_sma20 = QCheckBox(ChartWidget)
         self.check_sma20.setObjectName(u"check_sma20")
 
         self.gridLayout_2.addWidget(self.check_sma20, 1, 3, 1, 1)
 
-        self.check_sma60 = QCheckBox(self.widget)
+        self.check_sma60 = QCheckBox(ChartWidget)
         self.check_sma60.setObjectName(u"check_sma60")
 
         self.gridLayout_2.addWidget(self.check_sma60, 1, 4, 1, 1)
 
-        self.check_sma200 = QCheckBox(self.widget)
+        self.check_sma200 = QCheckBox(ChartWidget)
         self.check_sma200.setObjectName(u"check_sma200")
 
         self.gridLayout_2.addWidget(self.check_sma200, 1, 5, 1, 1)
 
-        self.label_2 = QLabel(self.widget)
+        self.label_2 = QLabel(ChartWidget)
         self.label_2.setObjectName(u"label_2")
 
         self.gridLayout_2.addWidget(self.label_2, 2, 0, 1, 1)
 
-        self.check_bb10 = QCheckBox(self.widget)
+        self.check_bb10 = QCheckBox(ChartWidget)
         self.check_bb10.setObjectName(u"check_bb10")
 
         self.gridLayout_2.addWidget(self.check_bb10, 2, 1, 1, 1)
 
-        self.check_bb20 = QCheckBox(self.widget)
+        self.check_bb20 = QCheckBox(ChartWidget)
         self.check_bb20.setObjectName(u"check_bb20")
 
         self.gridLayout_2.addWidget(self.check_bb20, 2, 2, 1, 1)
 
-        self.check_bb30 = QCheckBox(self.widget)
+        self.check_bb30 = QCheckBox(ChartWidget)
         self.check_bb30.setObjectName(u"check_bb30")
 
         self.gridLayout_2.addWidget(self.check_bb30, 2, 3, 1, 1)
@@ -127,7 +123,7 @@ class Ui_ChartWidget(object):
 
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
 
-        self.graphicsView = QGraphicsView(self.widget)
+        self.graphicsView = QGraphicsView(ChartWidget)
         self.graphicsView.setObjectName(u"graphicsView")
 
         self.verticalLayout_3.addWidget(self.graphicsView)
@@ -135,7 +131,8 @@ class Ui_ChartWidget(object):
 
         self.horizontalLayout.addLayout(self.verticalLayout_3)
 
-        self.horizontalLayout.setStretch(1, 1)
+        self.horizontalLayout.setStretch(0, 1)
+        self.horizontalLayout.setStretch(1, 4)
 
         self.retranslateUi(ChartWidget)
 
